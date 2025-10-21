@@ -26,7 +26,12 @@ h2 {
     background-color: var(--color-dark-blue-900);
     border: 1px solid white;
     border-radius: 10px;
+
     cursor: pointer;
+}
+
+.selected {
+    background-color: var(--color-dark-blue-1000);
 }
 
 .options-description {
