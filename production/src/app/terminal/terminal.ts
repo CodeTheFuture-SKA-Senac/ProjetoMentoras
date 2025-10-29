@@ -1,28 +1,31 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, QueryList, ViewChildren } from '@angular/core';
 import { ProductionControl } from '../production-control/production-control'
 import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { DialogSelect } from '../dialog-select/dialog-select';
 
-
+import { NgStyle } from '@angular/common'
 import { ProductionOrder } from '../../../../common/ProductionOrder'
 import { ProductionStatus } from '../../../../common/ProductionStatus'
 import { OrderColors_e, ProductionStatus_e, ProductionStatusColor_e } from '../../../../common/enums/enum';
 
 // import { MatButtonModule } from '@angular/material/button';
 
+import { Router } from '@angular/router';
 
 // JSON
 import productionOrders from '../../assets/files/production-orders.json';
-import stopTypes from '../../assets/files/stop-types.json'
+import stopTypes from '../../assets/files/stop-types.json';
 
 @Component({
   selector: 'app-terminal',
-  imports: [ProductionControl, MatDialogModule],
+  imports: [ProductionControl, MatDialogModule, NgStyle],
   templateUrl: './terminal.html',
   styleUrl: './terminal.scss'
 })
 
 export class Terminal {
+
+  @ViewChildren(ProductionControl) productionControl!: QueryList<ProductionControl>;
 
   readonly dialog: MatDialog = inject(MatDialog);
 
@@ -35,6 +38,10 @@ export class Terminal {
   OrderColors_e: typeof OrderColors_e = OrderColors_e;
   ProductionStatus_e: typeof ProductionStatus_e = ProductionStatus_e;
 
+  disabledStyle: any = {};
+
+  constructor(private router: Router) {}
+
   async setProductionOrder(): Promise<void> {
     const dialogData: Object = {
       dialogTitle: 'Selecionar ordem de produção',
@@ -44,10 +51,14 @@ export class Terminal {
     const newProductionOrder: ProductionOrder = await this.openSelectDialog(dialogData);
     if (!newProductionOrder) return;
 
-    this.productionOrder = newProductionOrder;
-    console.log('ProductionStatus_e :', ProductionStatus_e);
+    this.productionControl.forEach((prodControl: any) => prodControl.resetValues());
+    this.productionStatus = new ProductionStatus(ProductionStatus_e.InProduction, ProductionStatusColor_e.InProduction);
 
-    this.productionStatus = new ProductionStatus(ProductionStatus_e.InProduction, ProductionStatusColor_e.InProduction)
+    if (newProductionOrder.key === this.productionOrder.key)
+      return;
+
+    this.productionOrder = newProductionOrder;
+    this.disabledStyle = {'opacity': (!this.productionOrder.key || (this.productionStatus.color === ProductionStatusColor_e.Stop)) ? '0.5' : '1' }
   }
 
   async setStopType(): Promise<void> {
@@ -77,5 +88,9 @@ export class Terminal {
         resolve(result);
       })
     })
+  }
+
+  openImage(imageUrl: string): void {
+    this.router.navigate(['/image', imageUrl]);
   }
 }

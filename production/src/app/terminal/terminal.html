@@ -8,7 +8,7 @@
             <span class="title-style">Item em produção: {{productionOrder.value}}</span>
             
             <div class="item-content">
-                <img [src]="productionOrder.productImage"/>
+                <img [src]="productionOrder.productImage" (click)="openImage(productionOrder.productImage)"/>
 
                 <div class="item-description">
                     <div>
@@ -28,16 +28,26 @@
 
         <div class="divider"></div>
 
-        <div class="item-infos">
+        <div class="item-infos" [ngStyle]="disabledStyle">
             <span class="title-style">Quantidade de itens</span>
 
             <div class="production-infos">
                 <app-production-control 
                     [title]="'Produzido'"
+
+                    [icon]="'TbCircleCheckFilled'"
+                    [productionOrderQuantity]="productionOrder.quantity"
+                    [productionStatus]="productionStatus"
+                    [productionOrderKey]="productionOrder.key"
                 ></app-production-control>
 
                 <app-production-control
                     [title]="'Rejeitado'"
+
+                    [icon]="'TbCircleXFilled'"
+                    [productionOrderQuantity]="productionOrder.quantity"
+                    [productionStatus]="productionStatus"
+                    [productionOrderKey]="productionOrder.key"
                 ></app-production-control>
             </div>
         </div>
